@@ -7,9 +7,10 @@
 ## Работа приложения
 
 (кликабельно)
-
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/4dXUo3m3PiA/default.jpg)](https://www.youtube.com/shorts/4dXUo3m3PiA)
 
 ## 1. Обзор MainActivity
+![](https://github.com/nnka1/mobile_development.lab5/blob/main/photo_2024-12-03_15-37-30.jpg)
 
 • Взаимодействие с пользователем: Обрабатывает ввод ID журнала в поле journalIdEditText и обрабатывает нажатия кнопок "Загрузить" (downloadButton), "Смотреть" (viewButton) и "Удалить" (deleteButton).
 
