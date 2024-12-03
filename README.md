@@ -54,6 +54,81 @@
     }
 
    ```
+2. Проверка ID: Проверяет, не пустое ли поле ввода.
+3. Формирование URL: Создает URL для загрузки PDF-файла, используя полученный ID.
+```
+    Request request = new Request.Builder()
+                        .url("https://ntv.ifmo.ru/file/journal/" + journalId + ".pdf")
+                        .build();
+
+```
+4. Отправка запроса: Использует OkHttp для отправки GET-запроса к серверу. Загрузка выполняется в отдельном потоке для предотвращения блокировки UI.
+```
+    Response response = client.newCall(request).execute();
+```
+5. Обработка ответа: Проверяет код ответа (isSuccessful()) и тип содержимого (Content-Type). Обработка ошибок происходит в блоке catch.
+```
+    if (response.isSuccessful() && response.header("Content-Type") != null && response.header("Content-Type").startsWith("application/pdf")) {
+        // ... обработка успешного ответа ...
+    } else {
+        runOnUiThread(() -> statusTextView.setText("Файл не найден."));
+    }
+
+```
+6. Сохранение файла: Если загрузка успешна, сохраняет файл в директорию Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).
+```
+    try (InputStream inputStream = response.body().byteStream();
+         OutputStream outputStream = new FileOutputStream(downloadedFile)) {
+        byte[] buffer = new byte[4096];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+    }
+
+```
+7. Обновление UI: Обновляет statusTextView, а также включает кнопки "Смотреть" и "Удалить". Это делается с помощью runOnUiThread, чтобы изменения были видны в основном потоке.
+
+## 4. Просмотр и удаление файлов
+
+• openPDF(): Открывает PDF-файл с помощью системного приложения для просмотра PDF-файлов, используя FileProvider для обеспечения безопасного доступа. Обрабатывает ActivityNotFoundException в случае отсутствия подходящего приложения. Код openPDF показан полностью в исходном коде.
+• deleteFile(): Удаляет файл с устройства, обновляя UI. Код deleteFile показан полностью в исходном коде.
+
+
+## 5. Обработка разрешений
+
+Приложение запрашивает разрешение на запись во внешнее хранилище (WRITE_EXTERNAL_STORAGE).
+```
+private void requestStoragePermission() {
+    if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
+    } else {
+        downloadFile();
+    }
+}
+
+@Override
+public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    if (requestCode == REQUEST_STORAGE_PERMISSION) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            downloadFile();
+        } else {
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+```
+## 6. Инструкция при первом запуске
+
+При первом запуске приложения отображается диалоговое окно с инструкцией. Пользователь может отметить флажок, чтобы отключить отображение инструкции в будущем. Настройки сохраняются с помощью SharedPreferences. Код для этого показан полностью в исходном коде.
+
+
+## 7. Используемые библиотеки
+
+• OkHttp: Для отправки HTTP-запросов.
+• ActivityCompat и ContextCompat: Для работы с разрешениями.
+
 ## Как собрать проект?
 1. Загрузка или клонирование репозитория:
 * Скачайте файлы проекта (ZIP-архив) и разархивируйте их в удобную папку или клонируйте репозиторий с помощью команды git clone [URL репозитория].
