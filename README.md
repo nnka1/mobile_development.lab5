@@ -7,6 +7,7 @@
 ## Работа приложения
 
 (кликабельно)
+
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/4dXUo3m3PiA/default.jpg)](https://www.youtube.com/shorts/4dXUo3m3PiA)
 
 ## 1. Обзор MainActivity
